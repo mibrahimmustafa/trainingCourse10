@@ -78,7 +78,8 @@
       bannerContinue: "Continue",
       helpTooltip: "Need help? Click to view user guide & support.",
       searchPlaceholder: "Search course topics or policies...",
-      noAnnouncements: "No additional announcements at this time."
+      noAnnouncements: "No additional announcements at this time.",
+      close: "Close"
     },
     ar: {
       siteTitle: "دورة: فن البحث العلمي .. تمكين ممارسي الرعاية الصحية | هامات للتدريب",
@@ -137,7 +138,8 @@
       bannerContinue: "موافق ومتابعة",
       helpTooltip: "بحاجة للمساعدة؟ انقر لعرض الدليل والدعم.",
       searchPlaceholder: "ابحث في محاور الدورة أو السياسات...",
-      noAnnouncements: "لا توجد إعلانات إضافية حالياً."
+      noAnnouncements: "لا توجد إعلانات إضافية حالياً.",
+      close: "إغلاق"
     }
   };
 
@@ -809,6 +811,14 @@
       </div>
     `;
 
+    // Direct binding for all close buttons inside announcements modal
+    modal.querySelectorAll('.modal-close-btn, .modal-close-btn-action, [data-dismiss="modal"]').forEach(btn => {
+      btn.onclick = (e) => {
+        if (e) e.preventDefault();
+        closeModal(modal);
+      };
+    });
+
     markActivityCompleted(act.id);
     openModal('announcementsModal');
   }
@@ -943,6 +953,14 @@
       </div>
     `;
 
+    // Direct binding for close buttons inside policy modal
+    modal.querySelectorAll('.modal-close-btn, .modal-close-btn-action, [data-dismiss="modal"]').forEach(btn => {
+      btn.onclick = (e) => {
+        if (e) e.preventDefault();
+        closeModal(modal);
+      };
+    });
+
     openModal('policyModal');
   }
 
@@ -958,6 +976,14 @@
         ${content}
       </div>
     `;
+
+    // Direct binding for close buttons inside info modal
+    modal.querySelectorAll('.modal-close-btn, .modal-close-btn-action, [data-dismiss="modal"]').forEach(btn => {
+      btn.onclick = (e) => {
+        if (e) e.preventDefault();
+        closeModal(modal);
+      };
+    });
 
     openModal('policyModal');
   }
@@ -996,20 +1022,20 @@
 
   // --- MODAL UTILS ---
   function openModal(modalId) {
-    const m = document.getElementById(modalId);
+    const m = typeof modalId === 'string' ? document.getElementById(modalId) : modalId;
     if (m) {
       m.classList.add('open');
       document.body.style.overflow = 'hidden';
     }
   }
 
-  function closeModal(modalId) {
-    const m = document.getElementById(modalId);
+  function closeModal(modalRef) {
+    const m = typeof modalRef === 'string' ? document.getElementById(modalRef) : modalRef;
     if (m) {
       m.classList.remove('open');
       document.body.style.overflow = '';
       // Stop video playback if it's the video modal
-      if (modalId === 'videoModal') {
+      if (m.id === 'videoModal') {
         const playerWrap = document.getElementById('videoPlayerWrap');
         if (playerWrap) {
           const vid = playerWrap.querySelector('video');
@@ -1023,6 +1049,10 @@
       }
     }
   }
+
+  // Expose globally for HTML onclick attributes and external triggers
+  window.openModal = openModal;
+  window.closeModal = closeModal;
 
   // --- GLOBAL EVENTS & DROPDOWNS ---
   function setupGlobalEvents() {
@@ -1124,12 +1154,39 @@
       document.querySelectorAll('.completion-container.open').forEach(p => p.classList.remove('open'));
     });
 
-    // Modal Close buttons
-    document.querySelectorAll('.modal-close-btn, .modal-backdrop-close').forEach(btn => {
-      btn.onclick = () => {
-        const modal = btn.closest('.modal-overlay');
-        if (modal) closeModal(modal.id);
-      };
+    // Setup direct click handlers for all static modal close buttons
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+      modal.querySelectorAll('.modal-close-btn, .modal-close-btn-action, [data-dismiss="modal"]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          closeModal(modal);
+        });
+      });
+    });
+
+    // Universal Modal Close Handler (Direct clicks, action buttons, and backdrop clicks)
+    document.addEventListener('click', (e) => {
+      // 1. Click on any close button or action button (like the 'Close' button inside modal-footer)
+      const closeBtn = e.target.closest('.modal-close-btn, .modal-close-btn-action, .modal-backdrop-close, [data-dismiss="modal"]');
+      if (closeBtn) {
+        const modal = closeBtn.closest('.modal-overlay');
+        if (modal) closeModal(modal);
+        return;
+      }
+
+      // 2. Click on the dark backdrop outside modal card
+      if (e.target.classList.contains('modal-overlay')) {
+        closeModal(e.target);
+      }
+    });
+
+    // ESC key closes any open modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const openModal = document.querySelector('.modal-overlay.open');
+        if (openModal) closeModal(openModal);
+      }
     });
 
     // Top Dropdown Link Bindings (Policies & Info)
