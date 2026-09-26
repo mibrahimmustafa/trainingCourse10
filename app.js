@@ -195,15 +195,11 @@
   function renderNavbar() {
     const navSupportText = document.getElementById('navSupportText');
     const navVisionText = document.getElementById('navVisionText');
-    const userNotice = document.getElementById('userNoticeText');
     const homeLink = document.getElementById('navHomeLink');
 
     if (navSupportText) navSupportText.textContent = t('navSupport');
     if (navVisionText) navVisionText.textContent = t('navVision');
     if (homeLink) homeLink.textContent = t('home');
-    if (userNotice) {
-      userNotice.innerHTML = `<strong>${t('guestNotice')}</strong> <span class="divider-vertical"></span> <span class="demo-badge"><i class="fa fa-unlock-alt"></i> ${t('fullAccess')}</span>`;
-    }
   }
 
   // 2. COURSE HERO & TITLE
