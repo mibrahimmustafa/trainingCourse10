@@ -609,14 +609,21 @@
     const actTitle = act.title[state.lang] || act.title.en;
     titleEl.innerHTML = `<i class="fa fa-play-circle text-primary"></i> ${actTitle}`;
 
-    // Responsive embed with privacy-enhanced YouTube embed
+    const actNum = act.id.replace('act-', '');
+    const localSrc = act.localVideo || `assets/videos/video_${actNum}.mp4`;
+
+    // High performance local HTML5 video player
     playerWrap.innerHTML = `
-      <iframe 
-        src="https://www.youtube.com/embed/${act.youtubeId}?autoplay=1&rel=0&modestbranding=1" 
-        title="${actTitle}" 
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-        allowfullscreen>
-      </iframe>
+      <video 
+        id="courseLocalVideo" 
+        controls 
+        autoplay 
+        playsinline 
+        preload="metadata"
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; background: #0f172a; border-radius: 8px;">
+        <source src="${localSrc}" type="video/mp4">
+        Your browser does not support local HTML5 video playback.
+      </video>
     `;
 
     summaryText.textContent = act.summary || "";
@@ -1004,7 +1011,15 @@
       // Stop video playback if it's the video modal
       if (modalId === 'videoModal') {
         const playerWrap = document.getElementById('videoPlayerWrap');
-        if (playerWrap) playerWrap.innerHTML = '';
+        if (playerWrap) {
+          const vid = playerWrap.querySelector('video');
+          if (vid) {
+            vid.pause();
+            vid.src = '';
+            vid.load();
+          }
+          playerWrap.innerHTML = '';
+        }
       }
     }
   }
