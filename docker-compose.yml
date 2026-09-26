@@ -1,0 +1,15 @@
+services:
+  hamat-course-demo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hamat-course-demo:latest
+    container_name: hamat-course-app
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

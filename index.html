@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course: The Art of Scientific research .. Empowering Healthcare Workers to Enhance Community Well-being 1st part Scientific Research Through Time: Lessons from the Past, Visions for the Future | Hamat Educational</title>
+  <link rel="shortcut icon" href="assets/images/favicon.png" type="image/png">
+  
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Core Modern Styling -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ========================================================================
+       TOP SITE NAVIGATION
+       ======================================================================== -->
+  <header class="top-navbar" role="banner">
+    <div class="nav-left">
+      <button class="drawer-hamburger-btn" id="toggleDrawerBtn" type="button" aria-label="Toggle Navigation Drawer">
+        <i class="fa fa-bars"></i>
+      </button>
+
+      <a href="javascript:void(0)" class="brand-link" id="brandLink">
+        <img src="assets/images/hamat_logo.png" alt="Hamat Educational Logo" class="brand-logo">
+      </a>
+
+      <nav class="nav-menu" aria-label="Main Navigation">
+        <div class="nav-item">
+          <a href="javascript:void(0)" class="nav-link" id="navHomeLink">Home</a>
+        </div>
+
+        <!-- Dropdown 1: Support & Policies -->
+        <div class="nav-item">
+          <a href="javascript:void(0)" class="nav-link nav-dropdown-toggle">
+            <span id="navSupportText">الدعم الفني و الشكاوى و سياسة التدريب للمدربين</span>
+            <i class="fa fa-chevron-down ms-1 fs-xs"></i>
+          </a>
+          <div class="nav-dropdown-menu">
+            <a href="javascript:void(0)" class="dropdown-item" id="linkComplaints">
+              <i class="fa fa-envelope-open-text text-primary"></i> 
+              <span>الشكاوى والاستفسارات</span>
+            </a>
+            <a href="javascript:void(0)" class="dropdown-item" id="linkCourseSearch">
+              <i class="fa fa-magnifying-glass text-secondary"></i> 
+              <span>Course search</span>
+            </a>
+            <a href="javascript:void(0)" class="dropdown-item" id="linkTrainerPolicy">
+              <i class="fa fa-file-contract text-primary"></i> 
+              <span>سياسة التدريب للمدربين</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Dropdown 2: Vision & Guidelines -->
+        <div class="nav-item">
+          <a href="javascript:void(0)" class="nav-link nav-dropdown-toggle">
+            <span id="navVisionText">الرؤية و الرساله و الادلة الارشادية</span>
+            <i class="fa fa-chevron-down ms-1 fs-xs"></i>
+          </a>
+          <div class="nav-dropdown-menu">
+            <a href="javascript:void(0)" class="dropdown-item" id="linkVision">
+              <i class="fa fa-compass text-info"></i> 
+              <span>الرؤية و الرسالة</span>
+            </a>
+            <a href="javascript:void(0)" class="dropdown-item" id="linkLearnerGuide">
+              <i class="fa fa-book-medical text-success"></i> 
+              <span>دليل المتدرب الخاص بالقطاع الصحي</span>
+            </a>
+            <a href="javascript:void(0)" class="dropdown-item" id="linkInstructorGuide">
+              <i class="fa fa-chalkboard-user text-warning"></i> 
+              <span>دليل المدربين</span>
+            </a>
+            <a href="javascript:void(0)" class="dropdown-item" id="linkIntegrity">
+              <i class="fa fa-shield-halved text-danger"></i> 
+              <span>آلية منع الغش و انتحال الهوية (تحقيق النزاهة)</span>
+            </a>
+            <a href="javascript:void(0)" class="dropdown-item" id="linkTeam">
+              <i class="fa fa-headset text-primary"></i> 
+              <span>التواصل مع فريق العمل</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <div class="nav-right">
+      <!-- Language Selector -->
+      <div class="nav-item">
+        <button class="lang-selector-btn" id="langToggleBtn" type="button" aria-label="Select Language">
+          <i class="fa fa-language text-primary"></i>
+          <span id="currentLangLabel">English (en)</span>
+          <i class="fa fa-caret-down fs-xs"></i>
+        </button>
+        <div class="nav-dropdown-menu" id="langDropdownMenu">
+          <a href="javascript:void(0)" class="dropdown-item" id="langOptEn">
+            <i class="fa fa-check text-primary me-2"></i> English ‎(en)‎
+          </a>
+          <a href="javascript:void(0)" class="dropdown-item" id="langOptAr">
+            <i class="fa fa-globe text-secondary me-2"></i> العربية ‎(ar)‎
+          </a>
+        </div>
+      </div>
+
+      <div class="divider-vertical d-none d-md-block"></div>
+
+      <!-- User Status Pill -->
+      <div class="user-status-container">
+        <span id="userNoticeText">
+          <strong>Guest Evaluation Mode</strong>
+          <span class="demo-badge"><i class="fa fa-unlock-alt"></i> Full Access Unlocked</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       APPLICATION CONTAINER (DRAWER + MAIN CONTENT)
+       ======================================================================== -->
+  <div class="app-container">
+
+    <!-- FLOATING DRAWER TOGGLE (WHEN DRAWER IS CLOSED) -->
+    <button class="drawer-floating-toggle" id="floatingDrawerOpenBtn" type="button" title="Open course index" style="display: none;">
+      <i class="fa fa-list"></i>
+    </button>
+
+    <!-- LEFT COURSE INDEX DRAWER -->
+    <aside class="course-drawer" id="courseDrawer" aria-label="Course Index">
+      <div class="drawer-header">
+        <div class="drawer-header-left">
+          <button class="drawer-icon-btn" id="closeDrawerBtn" type="button" title="Close course index">
+            <i class="fa fa-times"></i>
+          </button>
+          <span class="drawer-title-label" id="drawerTitleLabel">Course index</span>
+        </div>
+
+        <div class="drawer-actions-dropdown">
+          <button class="drawer-icon-btn" id="drawerActionsBtn" type="button" title="Course index options">
+            <i class="fa fa-ellipsis-vertical"></i>
+          </button>
+          <div class="drawer-menu" id="drawerMenuContent"></div>
+        </div>
+      </div>
+
+      <div class="drawer-content" id="drawerSectionsList">
+        <!-- Dynamic Drawer Groups Rendered by app.js -->
+      </div>
+    </aside>
+
+    <!-- MAIN COURSE CONTENT -->
+    <main class="main-content" id="mainContentArea" role="main">
+
+      <!-- HERO / HEADER -->
+      <div class="course-hero">
+        <div class="breadcrumb-trail">
+          <span>Home</span>
+          <i class="fa fa-chevron-right fs-xs"></i>
+          <span>Courses</span>
+          <i class="fa fa-chevron-right fs-xs"></i>
+          <span>Medical Research</span>
+        </div>
+
+        <h1 class="course-main-title" id="courseMainTitle">
+          The Art of Scientific research .. Empowering Healthcare Workers to Enhance Community Well-being 1st part Scientific Research Through Time: Lessons from the Past, Visions for the Future
+        </h1>
+
+        <!-- PROGRESS BAR CARD -->
+        <section class="course-progress-card" aria-label="Your Course Progress">
+          <div class="progress-header">
+            <div class="progress-title" id="progressTitleText">
+              <i class="fa fa-chart-line text-primary"></i> Course Progress
+            </div>
+            <div class="progress-metrics" id="progressMetricsText">
+              0 / 27 (0%)
+            </div>
+          </div>
+
+          <div class="progress-track">
+            <div class="progress-fill" id="courseProgressBar"></div>
+          </div>
+
+          <div class="progress-footer">
+            <span>Accredited for 15 CME Hours • Hamat Training & Development</span>
+            <button class="btn-cert-quick" id="quickCertBtn" disabled type="button">
+              <i class="fa fa-award"></i> View CME Certificate
+            </button>
+          </div>
+        </section>
+      </div>
+
+      <!-- SECTIONS CONTROLS BAR -->
+      <div class="sections-controls-bar">
+        <button class="btn-toggle-all" id="toggleAllSectionsBtn" type="button">
+          Collapse all
+        </button>
+      </div>
+
+      <!-- DYNAMIC SECTIONS CONTAINER -->
+      <div id="courseSectionsContainer">
+        <!-- 13 Course Section Accordions Rendered by app.js -->
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ========================================================================
+       MODALS
+       ======================================================================== -->
+
+  <!-- 1. VIDEO PLAYER MODAL -->
+  <div class="modal-overlay" id="videoModal" role="dialog" aria-modal="true">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <h3 class="modal-title" id="videoModalTitle">
+          <i class="fa fa-play-circle text-primary"></i> Lecture Video
+        </h3>
+        <button class="modal-close-btn" type="button" aria-label="Close modal">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="video-frame-wrap" id="videoPlayerWrap"></div>
+        <div class="video-meta-box">
+          <h4 class="video-meta-title" id="videoSummaryHeader">Lecture Key Insights</h4>
+          <p id="videoSummaryText" class="text-secondary mb-3"></p>
+          <h4 class="video-meta-title">Clinical Takeaways</h4>
+          <ul class="video-notes-list" id="videoNotesList"></ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="btnMarkVideoComplete">
+          <i class="fa fa-check"></i> Mark as Completed
+        </button>
+        <button type="button" class="btn btn-primary" id="btnNextFromVideo">
+          <span>Next Lesson</span> <i class="fa fa-arrow-right ms-1"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. QUIZ RUNNER MODAL -->
+  <div class="modal-overlay" id="quizModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="quizModalTitle">
+          <i class="fa fa-clipboard-question text-danger"></i> Module Knowledge Check
+        </h3>
+        <button class="modal-close-btn" type="button" aria-label="Close modal">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="quizModalBody"></div>
+      <div class="modal-footer" id="quizModalFooter"></div>
+    </div>
+  </div>
+
+  <!-- 3. ANNOUNCEMENTS FORUM MODAL -->
+  <div class="modal-overlay" id="announcementsModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i class="fa fa-bullhorn text-primary"></i> Course Announcements
+        </h3>
+        <button class="modal-close-btn" type="button" aria-label="Close modal">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="announcementsBody"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline modal-close-btn-action">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. EVALUATION SURVEY MODAL -->
+  <div class="modal-overlay" id="evaluationModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i class="fa fa-star text-warning"></i> Activity Evaluation & Survey
+        </h3>
+        <button class="modal-close-btn" type="button" aria-label="Close modal">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="evaluationBody"></div>
+      <div class="modal-footer" id="evaluationFooter"></div>
+    </div>
+  </div>
+
+  <!-- 5. CME CERTIFICATE MODAL -->
+  <div class="modal-overlay" id="certificateModal" role="dialog" aria-modal="true">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i class="fa fa-award text-warning"></i> CME Accredited Certificate of Completion
+        </h3>
+        <button class="modal-close-btn" type="button" aria-label="Close modal">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="certificate-preview-container" id="printableCertificate">
+          <img src="assets/images/hamat_logo.png" alt="Hamat Logo" class="cert-logo-seal">
+          <div class="cert-main-title">Certificate of Completion</div>
+          <div class="text-muted fw-bold text-uppercase fs-sm tracking-wider">Hamat Training & Development • Medical Education Board</div>
+          <p class="mt-4 mb-2 text-secondary fs-md">This certifies that</p>
+          <div class="cert-recipient-name" id="certRecipientName">Dr. Mohamed Abdelrahman (Evaluation Director)</div>
+          <p class="text-secondary max-w-xl mx-auto mb-4" id="certCourseStatement">
+            has successfully completed all lectures, assessments, and continuing medical education requirements for:
+            <br>
+            <strong class="text-dark">The Art of Scientific research .. Empowering Healthcare Workers to Enhance Community Well-being 1st part</strong>
+          </p>
+
+          <div class="cert-details-grid">
+            <div>
+              <div class="text-muted small">Accredited Credit</div>
+              <div class="fw-bold text-dark fs-5">15 CME Hours</div>
+            </div>
+            <div>
+              <div class="text-muted small">Date Issued</div>
+              <div class="fw-bold text-dark" id="certDateVal">September 26, 2024</div>
+            </div>
+            <div>
+              <div class="text-muted small">Verification ID</div>
+              <div class="fw-bold font-monospace text-primary" id="certCodeVal">HAMAT-CME-884920</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div>
+          <button type="button" class="btn btn-outline" id="btnEditCertName">
+            <i class="fa fa-user-pen"></i> Edit Participant Name
+          </button>
+        </div>
+        <div>
+          <button type="button" class="btn btn-primary" id="btnPrintCertificate">
+            <i class="fa fa-print"></i> Print / Save PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. POLICY VIEWER MODAL -->
+  <div class="modal-overlay" id="policyModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="policyModalTitle">
+          <i class="fa fa-shield-halved text-primary"></i> Policy Information
+        </h3>
+        <button class="modal-close-btn" type="button" aria-label="Close modal">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="policyModalBody"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary modal-close-btn-action">Understood & Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       BOTTOM POLICY BANNER (AUTHENTIC REPLICA FROM LIVE SITE)
+       ======================================================================== -->
+  <div class="policy-bottom-banner" id="policyBottomBanner" role="region" aria-label="Policies agreement">
+    <div class="policy-banner-text" id="policyBannerText"></div>
+    <div class="policy-banner-actions">
+      <button class="btn-banner-continue" id="policyContinueBtn" type="button">Continue</button>
+      <button class="btn-banner-close" id="policyCloseBtn" type="button" aria-label="Close banner">×</button>
+    </div>
+  </div>
+
+  <!-- FLOATING HELP BUTTON (?) -->
+  <button class="floating-help-btn" id="floatingHelpBtn" type="button" title="Need help? Click for guide & support">
+    ?
+  </button>
+
+  <!-- ========================================================================
+       SITE FOOTER
+       ======================================================================== -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-inner">
+      <div>
+        <p class="mb-1"><strong>Hamat Educational Platform</strong> • Continuing Healthcare Professional Development</p>
+        <p class="text-muted small mb-0">Re-engineered High-Performance Frontend Demo for Management Review • Zero PHP Dependencies</p>
+      </div>
+      <ul class="footer-links">
+        <li><a href="javascript:void(0)" onclick="openPolicyModal(10)">Privacy & Terms</a></li>
+        <li><a href="javascript:void(0)" onclick="openPolicyModal(2)">Academic Integrity</a></li>
+        <li><a href="javascript:void(0)" onclick="openPolicyModal(6)">Technical Support</a></li>
+        <li><a href="javascript:void(0)" onclick="window.scrollTo({top:0, behavior:'smooth'})">Back to Top ↑</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- Core Scripts -->
+  <script src="course-data.js"></script>
+  <script src="policies-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
