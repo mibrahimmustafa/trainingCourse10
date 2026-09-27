@@ -6,17 +6,47 @@
 (function () {
   'use strict';
 
+  // --- USER IDENTITY & SCOPED STORAGE HELPER ---
+  const urlParams = new URLSearchParams(window.location.search);
+  const currentUserId = (
+    urlParams.get('userId') || 
+    urlParams.get('user_id') || 
+    urlParams.get('user') || 
+    urlParams.get('uid') || 
+    urlParams.get('id') || 
+    'guest'
+  ).trim();
+
+  let initialUserName = '';
+  try {
+    const rawName = urlParams.get('userName') || urlParams.get('name') || urlParams.get('user_name');
+    if (rawName) initialUserName = decodeURIComponent(rawName).trim();
+  } catch (e) {
+    initialUserName = (urlParams.get('userName') || urlParams.get('name') || '').trim();
+  }
+
+  function getStorageKey(key) {
+    if (!currentUserId || currentUserId === 'guest') {
+      return `hamat_${key}`;
+    }
+    return `hamat_u_${currentUserId}_${key}`;
+  }
+
   // --- STATE ---
   const state = {
+    userId: currentUserId,
+    userName: initialUserName,
     lang: localStorage.getItem('hamat_lang') || 'en',
-    completedActivities: new Set(JSON.parse(localStorage.getItem('hamat_completed') || '[]')),
-    quizScores: JSON.parse(localStorage.getItem('hamat_quiz_scores') || '{}'),
-    evaluationSubmitted: localStorage.getItem('hamat_eval_done') === 'true',
+    completedActivities: new Set(JSON.parse(localStorage.getItem(getStorageKey('completed')) || '[]')),
+    quizScores: JSON.parse(localStorage.getItem(getStorageKey('quiz_scores')) || '{}'),
+    evaluationSubmitted: localStorage.getItem(getStorageKey('eval_done')) === 'true',
     isDrawerOpen: window.innerWidth > 1024,
     expandedSections: new Set(['section-0', 'section-1']),
     currentActivity: null,
     currentQuizIndex: 0,
-    currentQuizAnswers: {}
+    currentQuizAnswers: {},
+    currentPercent: 0,
+    totalTrackable: 27
   };
 
   // --- TRANSLATIONS DICTIONARY ---
@@ -150,16 +180,36 @@
 
   function saveState() {
     localStorage.setItem('hamat_lang', state.lang);
-    localStorage.setItem('hamat_completed', JSON.stringify(Array.from(state.completedActivities)));
-    localStorage.setItem('hamat_quiz_scores', JSON.stringify(state.quizScores));
-    localStorage.setItem('hamat_eval_done', state.evaluationSubmitted ? 'true' : 'false');
+    localStorage.setItem(getStorageKey('completed'), JSON.stringify(Array.from(state.completedActivities)));
+    localStorage.setItem(getStorageKey('quiz_scores'), JSON.stringify(state.quizScores));
+    localStorage.setItem(getStorageKey('eval_done'), state.evaluationSubmitted ? 'true' : 'false');
+    if (state.userName) {
+      localStorage.setItem(getStorageKey('user_name'), state.userName);
+    }
   }
 
   // --- INITIALIZATION ---
   function init() {
+    // Check if URL requests instant reset
+    if (urlParams.get('reset') === '1' || urlParams.get('reset') === 'true') {
+      state.completedActivities.clear();
+      state.quizScores = {};
+      state.evaluationSubmitted = false;
+      localStorage.removeItem(getStorageKey('completed'));
+      localStorage.removeItem(getStorageKey('quiz_scores'));
+      localStorage.removeItem(getStorageKey('eval_done'));
+      if (currentUserId === 'guest') {
+        localStorage.removeItem('hamat_completed');
+        localStorage.removeItem('hamat_quiz_scores');
+        localStorage.removeItem('hamat_eval_done');
+      }
+      saveState();
+    }
+
     applyLanguage(state.lang, false);
     renderApp();
     setupGlobalEvents();
+    setupPostMessageBridge();
     updateProgressUI();
   }
 
@@ -547,7 +597,10 @@
       }
     });
 
+    state.currentPercent = percent;
+    state.totalTrackable = totalTrackable;
     saveState();
+    notifyParentProgress(percent, completedCount, totalTrackable);
   }
 
   function markActivityCompleted(actId) {
@@ -900,7 +953,7 @@
     const certCode = document.getElementById('certCodeVal');
     const certDate = document.getElementById('certDateVal');
 
-    const defaultName = localStorage.getItem('hamat_user_name') || (state.lang === 'ar' ? 'د. محمد عبدالرحمن (مدير التقييم)' : 'Dr. Mohamed Abdelrahman (Evaluation Director)');
+    const defaultName = localStorage.getItem(getStorageKey('user_name')) || state.userName || (state.lang === 'ar' ? 'المتدرب' : 'Participant');
     if (certName) certName.textContent = defaultName;
     if (certCode) certCode.textContent = 'HAMAT-CME-2024-' + Math.floor(100000 + Math.random() * 900000);
     if (certDate) {
@@ -920,8 +973,9 @@
       editNameBtn.onclick = () => {
         const newName = prompt(state.lang === 'ar' ? 'أدخل اسم المتدرب على الشهادة:' : 'Enter participant name for certificate:', certName.textContent);
         if (newName && newName.trim()) {
-          certName.textContent = newName.trim();
-          localStorage.setItem('hamat_user_name', newName.trim());
+          state.userName = newName.trim();
+          certName.textContent = state.userName;
+          localStorage.setItem(getStorageKey('user_name'), state.userName);
         }
       };
     }
@@ -1272,10 +1326,95 @@
       state.completedActivities.clear();
       state.quizScores = {};
       state.evaluationSubmitted = false;
+      localStorage.removeItem(getStorageKey('completed'));
+      localStorage.removeItem(getStorageKey('quiz_scores'));
+      localStorage.removeItem(getStorageKey('eval_done'));
+      if (currentUserId === 'guest') {
+        localStorage.removeItem('hamat_completed');
+        localStorage.removeItem('hamat_quiz_scores');
+        localStorage.removeItem('hamat_eval_done');
+      }
       saveState();
       renderApp();
       updateProgressUI();
     }
+  }
+
+  // --- LMS TWO-WAY MESSAGING (POSTMESSAGE BRIDGE) ---
+  function notifyParentProgress(percent, completedCount, totalTrackable) {
+    try {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({
+          type: 'COURSE_PROGRESS_UPDATE',
+          source: 'hamat_course',
+          userId: currentUserId,
+          percent: percent,
+          completedCount: completedCount,
+          totalTrackable: totalTrackable,
+          completedActivities: Array.from(state.completedActivities)
+        }, '*');
+      }
+    } catch (e) {
+      console.warn('postMessage notification failed:', e);
+    }
+  }
+
+  function setupPostMessageBridge() {
+    window.addEventListener('message', (event) => {
+      if (!event.data || typeof event.data !== 'object') return;
+
+      // Parent platform requests current progress
+      if (event.data.type === 'GET_PROGRESS') {
+        notifyParentProgress(
+          state.currentPercent || 0,
+          state.completedActivities.size,
+          state.totalTrackable || 27
+        );
+      }
+
+      // Parent platform passes user data or initial progress from DB
+      if (event.data.type === 'SET_USER_PROGRESS' || event.data.type === 'INIT_USER_PROGRESS') {
+        if (event.data.userId && event.data.userId !== state.userId) {
+          state.userId = event.data.userId;
+        }
+        if (event.data.userName) {
+          state.userName = event.data.userName;
+        }
+        if (Array.isArray(event.data.completedActivities)) {
+          state.completedActivities = new Set(event.data.completedActivities);
+        }
+        if (event.data.quizScores && typeof event.data.quizScores === 'object') {
+          state.quizScores = { ...state.quizScores, ...event.data.quizScores };
+        }
+        if (typeof event.data.evaluationSubmitted === 'boolean') {
+          state.evaluationSubmitted = event.data.evaluationSubmitted;
+        }
+        saveState();
+        renderApp();
+        updateProgressUI();
+      }
+
+      // Parent platform requests progress reset
+      if (event.data.type === 'RESET_PROGRESS') {
+        state.completedActivities.clear();
+        state.quizScores = {};
+        state.evaluationSubmitted = false;
+        saveState();
+        renderApp();
+        updateProgressUI();
+      }
+    });
+
+    // Notify parent platform that iframe is ready
+    try {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({
+          type: 'COURSE_IFRAME_READY',
+          source: 'hamat_course',
+          userId: currentUserId
+        }, '*');
+      }
+    } catch (e) {}
   }
 
   // Auto init on DOMContentLoaded
