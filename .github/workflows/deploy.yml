@@ -16,7 +16,7 @@ jobs:
       - name: Upload files via SFTP
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.FTP_SERVER }}
+          host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.FTP_USERNAME  }}
           password: ${{ secrets.FTP_PASSWORD  }}
           port: ${{ secrets.FTP_PORT }}
