@@ -49,6 +49,31 @@
     totalTrackable: 27
   };
 
+  // Immediate bootstrapping: Read completed activities from URL query params or server variable
+  (function bootstrapCompletedActivities() {
+    try {
+      const urlCompleted = new URLSearchParams(window.location.search).get('completed');
+      const serverCompleted = window.__HAMAT_SERVER_COMPLETED;
+      const rawCompleted = urlCompleted || serverCompleted;
+      if (rawCompleted) {
+        let list = [];
+        if (Array.isArray(rawCompleted)) {
+          list = rawCompleted;
+        } else if (typeof rawCompleted === 'string') {
+          list = rawCompleted.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+        }
+        if (list.length > 0) {
+          list.forEach(function (id) {
+            state.completedActivities.add(id);
+          });
+          localStorage.setItem(getStorageKey('completed'), JSON.stringify(Array.from(state.completedActivities)));
+        }
+      }
+    } catch (e) {
+      console.warn('Completed activities bootstrapping error:', e);
+    }
+  })();
+
   // --- TRANSLATIONS DICTIONARY ---
   const i18n = {
     en: {
@@ -204,6 +229,29 @@
         localStorage.removeItem('hamat_eval_done');
       }
       saveState();
+    } else {
+      // Re-check in case window.__HAMAT_SERVER_COMPLETED was populated during DOM loading
+      const urlCompleted = new URLSearchParams(window.location.search).get('completed');
+      const serverCompleted = window.__HAMAT_SERVER_COMPLETED;
+      const rawCompleted = urlCompleted || serverCompleted;
+      if (rawCompleted) {
+        let list = [];
+        if (Array.isArray(rawCompleted)) {
+          list = rawCompleted;
+        } else if (typeof rawCompleted === 'string') {
+          list = rawCompleted.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+        }
+        let changed = false;
+        list.forEach(function (id) {
+          if (!state.completedActivities.has(id)) {
+            state.completedActivities.add(id);
+            changed = true;
+          }
+        });
+        if (changed) {
+          saveState();
+        }
+      }
     }
 
     applyLanguage(state.lang, false);
@@ -211,6 +259,11 @@
     setupGlobalEvents();
     setupPostMessageBridge();
     updateProgressUI();
+
+    // Request progress from parent LMS platform immediately upon loading
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'REQUEST_PROGRESS' }, '*');
+    }
   }
 
   // --- LANGUAGE SWITCHER ---
@@ -1290,12 +1343,13 @@
       if (window.parent && window.parent !== window) {
         window.parent.postMessage({
           type: 'COURSE_PROGRESS_UPDATE',
-          source: 'hamat_course',
-          userId: currentUserId,
-          percent: percent,
           completedCount: completedCount,
           totalTrackable: totalTrackable,
-          completedActivities: Array.from(state.completedActivities)
+          percent: percent,
+          completed: percent >= 100,
+          completedActivities: Array.from(state.completedActivities),
+          source: 'hamat_course',
+          userId: currentUserId
         }, '*');
       }
     } catch (e) {
@@ -1304,11 +1358,38 @@
   }
 
   function setupPostMessageBridge() {
-    window.addEventListener('message', (event) => {
-      if (!event.data || typeof event.data !== 'object') return;
+    window.addEventListener('message', function (e) {
+      if (!e.data) return;
+      let data = e.data;
+      if (typeof data === 'string') {
+        try { data = JSON.parse(data); } catch (err) {}
+      }
+      if (!data || typeof data !== 'object') return;
 
-      // Parent platform requests current progress
-      if (event.data.type === 'GET_PROGRESS') {
+      // 1. Sync completed activities and progress from parent platform (doctor-book.net)
+      if (data.type === 'SYNC_COURSE_PROGRESS') {
+        let activities = data.completedActivities;
+        if (typeof activities === 'string') {
+          activities = activities.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+        }
+        if (Array.isArray(activities) && activities.length > 0) {
+          let changed = false;
+          activities.forEach(function (id) {
+            if (!state.completedActivities.has(id)) {
+              state.completedActivities.add(id);
+              changed = true;
+            }
+          });
+          if (changed) {
+            saveState();
+            renderApp();
+            updateProgressUI();
+          }
+        }
+      }
+
+      // 2. Parent platform requests current progress
+      if (data.type === 'GET_PROGRESS') {
         notifyParentProgress(
           state.currentPercent || 0,
           state.completedActivities.size,
@@ -1316,30 +1397,30 @@
         );
       }
 
-      // Parent platform passes user data or initial progress from DB
-      if (event.data.type === 'SET_USER_PROGRESS' || event.data.type === 'INIT_USER_PROGRESS') {
-        if (event.data.userId && event.data.userId !== state.userId) {
-          state.userId = event.data.userId;
+      // 3. Parent platform passes user data or initial progress from DB
+      if (data.type === 'SET_USER_PROGRESS' || data.type === 'INIT_USER_PROGRESS') {
+        if (data.userId && data.userId !== state.userId) {
+          state.userId = data.userId;
         }
-        if (event.data.userName) {
-          state.userName = event.data.userName;
+        if (data.userName) {
+          state.userName = data.userName;
         }
-        if (Array.isArray(event.data.completedActivities)) {
-          state.completedActivities = new Set(event.data.completedActivities);
+        if (Array.isArray(data.completedActivities)) {
+          state.completedActivities = new Set(data.completedActivities);
         }
-        if (event.data.quizScores && typeof event.data.quizScores === 'object') {
-          state.quizScores = { ...state.quizScores, ...event.data.quizScores };
+        if (data.quizScores && typeof data.quizScores === 'object') {
+          state.quizScores = { ...state.quizScores, ...data.quizScores };
         }
-        if (typeof event.data.evaluationSubmitted === 'boolean') {
-          state.evaluationSubmitted = event.data.evaluationSubmitted;
+        if (typeof data.evaluationSubmitted === 'boolean') {
+          state.evaluationSubmitted = data.evaluationSubmitted;
         }
         saveState();
         renderApp();
         updateProgressUI();
       }
 
-      // Parent platform requests progress reset
-      if (event.data.type === 'RESET_PROGRESS') {
+      // 4. Parent platform requests progress reset
+      if (data.type === 'RESET_PROGRESS') {
         state.completedActivities.clear();
         state.quizScores = {};
         state.evaluationSubmitted = false;
@@ -1367,5 +1448,14 @@
   } else {
     init();
   }
+
+  // Also request progress on window load event to ensure parent listeners are active
+  window.addEventListener('load', function () {
+    try {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'REQUEST_PROGRESS' }, '*');
+      }
+    } catch (e) {}
+  });
 
 })();
