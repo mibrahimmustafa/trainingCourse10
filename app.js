@@ -256,16 +256,12 @@
   function renderCourseHero() {
     const heroTitle = document.getElementById('courseMainTitle');
     const progressTitle = document.getElementById('progressTitleText');
-    const certBtn = document.getElementById('quickCertBtn');
 
     if (heroTitle) {
       heroTitle.textContent = COURSE_DATA.title[state.lang] || COURSE_DATA.title.en;
     }
     if (progressTitle) {
       progressTitle.innerHTML = `<i class="fa fa-chart-line text-primary"></i> ${t('courseProgress')}`;
-    }
-    if (certBtn) {
-      certBtn.innerHTML = `<i class="fa fa-award"></i> ${t('viewCertificate')}`;
     }
   }
 
@@ -572,21 +568,9 @@
 
     const progressFill = document.getElementById('courseProgressBar');
     const metricsLabel = document.getElementById('progressMetricsText');
-    const quickCertBtn = document.getElementById('quickCertBtn');
 
     if (progressFill) progressFill.style.width = `${percent}%`;
     if (metricsLabel) metricsLabel.textContent = `${completedCount} / ${totalTrackable} (${percent}%)`;
-
-    if (quickCertBtn) {
-      // In demo mode, manager can always click to preview certificate!
-      quickCertBtn.removeAttribute('disabled');
-      const postTestDone = state.completedActivities.has('act-195');
-      if (percent >= 70 || postTestDone) {
-        quickCertBtn.classList.add('pulse-glow');
-      } else {
-        quickCertBtn.classList.remove('pulse-glow');
-      }
-    }
 
     // Update section check icons in drawer
     COURSE_DATA.sections.forEach(sec => {
@@ -940,47 +924,14 @@
       state.evaluationSubmitted = true;
       markActivityCompleted(act.id);
       closeModal('evaluationModal');
-      openCertificateModal();
     };
 
     openModal('evaluationModal');
   }
 
-  // --- 5. CERTIFICATE MODAL & GENERATOR ---
+  // --- 5. CERTIFICATE (DISABLED) ---
   function openCertificateModal() {
-    const modal = document.getElementById('certificateModal');
-    const certName = document.getElementById('certRecipientName');
-    const certCode = document.getElementById('certCodeVal');
-    const certDate = document.getElementById('certDateVal');
-
-    const defaultName = localStorage.getItem(getStorageKey('user_name')) || state.userName || (state.lang === 'ar' ? 'المتدرب' : 'Participant');
-    if (certName) certName.textContent = defaultName;
-    if (certCode) certCode.textContent = 'HAMAT-CME-2024-' + Math.floor(100000 + Math.random() * 900000);
-    if (certDate) {
-      const now = new Date();
-      certDate.textContent = now.toLocaleDateString(state.lang === 'ar' ? 'ar-SA' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    }
-
-    const printBtn = document.getElementById('btnPrintCertificate');
-    if (printBtn) {
-      printBtn.onclick = () => {
-        window.print();
-      };
-    }
-
-    const editNameBtn = document.getElementById('btnEditCertName');
-    if (editNameBtn) {
-      editNameBtn.onclick = () => {
-        const newName = prompt(state.lang === 'ar' ? 'أدخل اسم المتدرب على الشهادة:' : 'Enter participant name for certificate:', certName.textContent);
-        if (newName && newName.trim()) {
-          state.userName = newName.trim();
-          certName.textContent = state.userName;
-          localStorage.setItem(getStorageKey('user_name'), state.userName);
-        }
-      };
-    }
-
-    openModal('certificateModal');
+    // Certificate feature disabled
   }
 
   // --- 6. POLICY MODAL ---
@@ -1065,8 +1016,7 @@
       scrollToSection(nextSec.id);
       openActivity(nextAct, nextSec);
     } else {
-      // Reached the end! Open certificate
-      openCertificateModal();
+      // Reached the end of the course
     }
   }
 
@@ -1182,11 +1132,6 @@
       };
     }
 
-    // Quick Certificate button in progress bar
-    const quickCertBtn = document.getElementById('quickCertBtn');
-    if (quickCertBtn) {
-      quickCertBtn.onclick = () => openCertificateModal();
-    }
 
     // Floating Help Button
     const helpBtn = document.getElementById('floatingHelpBtn');
@@ -1318,7 +1263,6 @@
     saveState();
     renderApp();
     updateProgressUI();
-    openCertificateModal();
   }
 
   function resetProgress() {

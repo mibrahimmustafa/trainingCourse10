@@ -203,9 +203,6 @@
 
           <div class="progress-footer">
             <span>Accredited for 15 CME Hours • Hamat Training & Development</span>
-            <button class="btn-cert-quick" id="quickCertBtn" disabled type="button">
-              <i class="fa fa-award"></i> View CME Certificate
-            </button>
           </div>
         </section>
       </div>
@@ -310,63 +307,6 @@
     </div>
   </div>
 
-  <!-- 5. CME CERTIFICATE MODAL -->
-  <div class="modal-overlay" id="certificateModal" role="dialog" aria-modal="true" onclick="if(event.target===this)closeModal('certificateModal')">
-    <div class="modal-card modal-lg">
-      <div class="modal-header">
-        <h3 class="modal-title">
-          <i class="fa fa-award text-warning"></i> CME Accredited Certificate of Completion
-        </h3>
-        <button class="modal-close-btn" type="button" aria-label="Close modal" onclick="closeModal('certificateModal')">
-          <i class="fa fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="certificate-preview-container" id="printableCertificate">
-          <img src="assets/images/hamat_logo.png" alt="Hamat Logo" class="cert-logo-seal">
-          <div class="cert-main-title">Certificate of Completion</div>
-          <div class="text-muted fw-bold text-uppercase fs-sm tracking-wider">Hamat Training & Development • Medical Education Board</div>
-          <p class="mt-4 mb-2 text-secondary fs-md">This certifies that</p>
-          <div class="cert-recipient-name" id="certRecipientName">Dr. Mohamed Abdelrahman (Evaluation Director)</div>
-          <p class="text-secondary max-w-xl mx-auto mb-4" id="certCourseStatement">
-            has successfully completed all lectures, assessments, and continuing medical education requirements for:
-            <br>
-            <strong class="text-dark">The Art of Scientific research .. Empowering Healthcare Workers to Enhance Community Well-being 1st part</strong>
-          </p>
-
-          <div class="cert-details-grid">
-            <div>
-              <div class="text-muted small">Accredited Credit</div>
-              <div class="fw-bold text-dark fs-5">15 CME Hours</div>
-            </div>
-            <div>
-              <div class="text-muted small">Date Issued</div>
-              <div class="fw-bold text-dark" id="certDateVal">September 26, 2024</div>
-            </div>
-            <div>
-              <div class="text-muted small">Verification ID</div>
-              <div class="fw-bold font-monospace text-primary" id="certCodeVal">HAMAT-CME-884920</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <div>
-          <button type="button" class="btn btn-outline" id="btnEditCertName">
-            <i class="fa fa-user-pen"></i> Edit Participant Name
-          </button>
-        </div>
-        <div class="d-flex gap-2">
-          <button type="button" class="btn btn-outline modal-close-btn-action" data-dismiss="modal" onclick="closeModal('certificateModal')">
-            <i class="fa fa-times"></i> <span data-i18n="close">Close</span>
-          </button>
-          <button type="button" class="btn btn-primary" id="btnPrintCertificate">
-            <i class="fa fa-print"></i> Print / Save PDF
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- 6. POLICY VIEWER MODAL -->
   <div class="modal-overlay" id="policyModal" role="dialog" aria-modal="true" onclick="if(event.target===this)closeModal('policyModal')">

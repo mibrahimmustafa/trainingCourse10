@@ -57,10 +57,10 @@ const COURSE_DATA = {
               },
               {
                 id: 2,
-                title: "CME Accreditation & Verification Guidelines",
+                title: "Course Completion & Evaluation Guidelines",
                 author: "Academic Accreditation Unit",
                 date: "2024-05-18",
-                body: "To receive your CME Certificate of Completion, you must achieve at least 70% on the final comprehensive Post-Test and submit the Activity Evaluation feedback survey. The certificate is issued automatically upon passing."
+                body: "To complete the course, you must achieve at least 70% on the final comprehensive Post-Test and submit the Activity Evaluation feedback survey."
               },
               {
                 id: 3,
@@ -922,8 +922,8 @@ const COURSE_DATA = {
         ar: "الاختبار البعدي الشامل وتقييم الدورة"
       },
       summary: {
-        en: "Final comprehensive examination (10 questions), course feedback evaluation, and instant CME certificate issuance.",
-        ar: "الاختبار النهائي الشامل (10 أسئلة) وتقييم الدورة وإصدار شهادة الساعات المعتمدة."
+        en: "Final comprehensive examination (10 questions) and course feedback evaluation.",
+        ar: "الاختبار النهائي الشامل (10 أسئلة) واستبانة تقييم الدورة التدريبية."
       },
       activities: [
         {
