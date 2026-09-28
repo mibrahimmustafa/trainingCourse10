@@ -734,8 +734,12 @@ button {
   border-radius: var(--radius-lg);
   margin-bottom: 1.5rem;
   box-shadow: var(--shadow-sm);
-  overflow: hidden;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.section-card.has-open-dropdown {
+  position: relative;
+  z-index: 30;
 }
 
 .section-card:hover {
@@ -751,7 +755,13 @@ button {
   cursor: pointer;
   user-select: none;
   background: #ffffff;
+  border-radius: var(--radius-lg);
   transition: background var(--transition-fast);
+}
+
+.section-card.expanded .section-card-header {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .section-card-header:hover {
@@ -817,6 +827,8 @@ button {
   border-top: 1px solid var(--border-light);
   padding: 0.5rem 0;
   display: none;
+  border-bottom-left-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
 }
 
 .section-card.expanded .section-card-body {
@@ -837,6 +849,8 @@ button {
 
 .activity-row:last-child {
   border-bottom: none;
+  border-bottom-left-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
 }
 
 .activity-row:hover {

@@ -482,13 +482,21 @@
 
         // Click completion pill shows dropdown
         const compBtn = row.querySelector('.completion-pill-btn');
+        const compDropdown = row.querySelector('.completion-dropdown-box');
+        if (compDropdown) {
+          compDropdown.addEventListener('click', (e) => e.stopPropagation());
+        }
         compBtn.addEventListener('click', (e) => {
           e.stopPropagation();
           const compContainer = row.querySelector('.completion-container');
           document.querySelectorAll('.completion-container.open').forEach(el => {
-            if (el !== compContainer) el.classList.remove('open');
+            if (el !== compContainer) {
+              el.classList.remove('open');
+              el.closest('.section-card')?.classList.remove('has-open-dropdown');
+            }
           });
-          compContainer.classList.toggle('open');
+          const isOpen = compContainer.classList.toggle('open');
+          row.closest('.section-card')?.classList.toggle('has-open-dropdown', isOpen);
         });
 
         actsContainer.appendChild(row);
@@ -1200,6 +1208,7 @@
       document.querySelectorAll('.nav-item.open').forEach(p => p.classList.remove('open'));
       document.querySelectorAll('.drawer-actions-dropdown.open').forEach(p => p.classList.remove('open'));
       document.querySelectorAll('.completion-container.open').forEach(p => p.classList.remove('open'));
+      document.querySelectorAll('.section-card.has-open-dropdown').forEach(p => p.classList.remove('has-open-dropdown'));
     });
 
     // Setup direct click handlers for all static modal close buttons
